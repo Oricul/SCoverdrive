@@ -16,7 +16,7 @@ try:
 except FileNotFoundError:
     exit("{}.json is not in the current bot directory.".format(jsonfile))
 
-class test:
+class core:
     def __init__(self, bot):
         self.bot = bot
 
@@ -170,4 +170,4 @@ class test:
 
 
 def setup(bot):
-    bot.add_cog(test(bot))
+    bot.add_cog(core(bot))

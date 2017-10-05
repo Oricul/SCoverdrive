@@ -57,9 +57,7 @@ class test:
                                 embed.set_author(name=allFound['handle'].title(),icon_url=allFound['avatar'])
                                 embed.set_thumbnail(url=allFound['avatar'])
                                 for i in message.server.roles:
-                                    print("approveRole: {}, i: {}".format(approveRole.upper(),i.name.upper()))
                                     if (approveRole.upper() == i.name.upper()):
-                                        print("FOUND")
                                         await self.bot.add_roles(message.author,i)
                                         break
                                 await self.bot.send_message(message.channel,embed=embed)
@@ -70,6 +68,10 @@ class test:
                                                       description="You've been detected as a affiliate. Welcome.")
                                 embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
                                 embed.set_thumbnail(url=allFound['avatar'])
+                                for i in message.server.roles:
+                                    if (affiliateRole.upper() == i.name.upper()):
+                                        await self.bot.add_roles(message.author,i)
+                                        break
                                 await self.bot.send_message(message.channel,embed=embed)
                         else:
                             await self.bot.add_reaction(message,"{}".format(pendingEmoji))

@@ -60,6 +60,7 @@ class test:
                                     if (approveRole.upper() == i.name.upper()):
                                         await self.bot.add_roles(message.author,i)
                                         break
+                                await self.bot.change_nickname(message.author,foundHandle)
                                 await self.bot.send_message(message.channel,embed=embed)
                             else:
                                 await self.bot.add_reaction(message,"{}".format(affiliateEmoji))
@@ -72,6 +73,7 @@ class test:
                                     if (affiliateRole.upper() == i.name.upper()):
                                         await self.bot.add_roles(message.author,i)
                                         break
+                                await self.bot.change_nickname(message.author, foundHandle)
                                 await self.bot.send_message(message.channel,embed=embed)
                         else:
                             await self.bot.add_reaction(message,"{}".format(pendingEmoji))

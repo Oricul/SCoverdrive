@@ -113,6 +113,7 @@ class test:
 
     @commands.command(pass_context=True,hidden=True)
     async def recheck(self,ctx,userName,handle):
+        userName = ctx.message.server.get_member(userName[2:-1])
         try:
             await self.bot.delete_message(ctx.message)
         except:
@@ -141,7 +142,7 @@ class test:
                                               description="{} has been detected as a member.".format(handle))
                         embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
                         embed.set_thumbnail(url=allFound['avatar'])
-                        for i in ctx.message.server.roles:
+                        for i in ctx.message.server.role_hierarchy:
                             if (approveRole.upper() == i.name.upper()):
                                 await self.bot.add_roles(userName, i)
                                 break

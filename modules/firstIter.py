@@ -118,6 +118,7 @@ class test:
         except:
             pass
         if (ctx.message.author.bot == False):
+            print("SERV PERM ADMIN")
             if (ctx.message.author.server_permissions.administrator == True):
                 session = aiohttp.ClientSession()
                 getURL = "http://sc-api.com/?data_source=RSI&api_source=live&system=accounts&action=full_profile&target_id={}".format(
@@ -128,15 +129,16 @@ class test:
                     found = allFound['organizations']
                     session.close()
                 orgFound = 0
-                orgList = []
+                orgList = ""
                 for i in found:
                     if (i['sid'] != ""):
-                        orgList.append(i['sid'])
+                        orgList = "{}\n{}".format(orgList,(i['sid']))
                         if (i['sid'].upper() == orgSID.upper()):
                             orgFound = 1
                             break
                 if orgFound:
                     if (found[0]['sid'].upper() == orgSID.upper()):
+                        print("CTX MESSAGE 142")
                         await self.bot.add_reaction(ctx.message, "{}".format(approveEmoji))
                         embed = discord.Embed(colour=discord.Colour(0x00FF00),
                                               description="{} has been detected as a member.".format(handle))
@@ -144,9 +146,12 @@ class test:
                         embed.set_thumbnail(url=allFound['avatar'])
                         for i in ctx.message.server.roles:
                             if (approveRole.upper() == i.name.upper()):
+                                print("ADD ROLE")
                                 await self.bot.add_roles(userName, i)
                                 break
+                        print("CHANGE NICKNAME 153")
                         await self.bot.change_nickname(userName, handle)
+                        print("RESPOND 155")
                         await self.bot.send_message(ctx.message.channel, embed=embed)
                     else:
                         await self.bot.add_reaction(ctx.message, "{}".format(affiliateEmoji))
@@ -163,7 +168,8 @@ class test:
                 else:
                     await self.bot.add_reaction(ctx.message, "{}".format(pendingEmoji))
                     embed = discord.Embed(colour=discord.Colour(0xFFFF00),
-                                          description="Still not found. Please verify manually.")
+                                          description="Still not found. Please verify manually.\nDetected:{}".format(
+                                              orgList))
                     embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
                     embed.set_thumbnail(url=allFound['avatar'])
                     await self.bot.send_message(ctx.message.channel, embed=embed)

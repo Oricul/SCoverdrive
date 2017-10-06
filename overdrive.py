@@ -12,7 +12,7 @@ try:
 except FileNotFoundError:
     exit("{}.json is not in the current bot directory.".format(jsonfile))
 
-startup_extensions = ['core']
+startup_extensions = ['core','timed']
 description = "OVERDRIVE for Discord (API v{0}) written in Python3 (v{1}) by Ori.".format(discord.__version__,python_version())
 
 bot = commands.Bot(command_prefix='od.', description=description)

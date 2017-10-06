@@ -1,4 +1,4 @@
-import discord, json, aiohttp
+import discord, json, aiohttp, asyncio
 from discord.ext import commands
 from .printoverride import print as print
 
@@ -39,10 +39,17 @@ class core:
                     session = aiohttp.ClientSession()
                     getURL = "http://sc-api.com/?data_source=RSI&api_source=live&system=accounts&action=full_profile&target_id={}".format(foundHandle)
                     headers = {'content-type': 'application/json'}
-                    async with session.post(getURL, headers=headers) as resp:
-                        allFound = (await resp.json())['data']
-                        found = allFound['organizations']
-                        session.close()
+                    while True:
+                        try:
+                            async with session.post(getURL, headers=headers) as resp:
+                                allFound = (await resp.json())['data']
+                                found = allFound['organizations']
+                                await session.close()
+                                break
+                        except:
+                            await session.close()
+                            await asyncio.sleep(2.5)
+                            continue
                     orgFound = 0
                     for i in found:
                         if (i['sid'] != ""):
@@ -77,7 +84,8 @@ class core:
                     else:
                         await self.bot.add_reaction(message,"{}".format(pendingEmoji))
                         embed = discord.Embed(colour=discord.Colour(0xFFFF00),
-                                              description="Pending manual verification, please standby.")
+                                              description="Your org is hidden, redacted or you are not a member. Fix this and try again.".format(
+                                                  message.author))
                         embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
                         embed.set_thumbnail(url=allFound['avatar'])
                         await self.bot.send_message(message.channel,embed=embed)

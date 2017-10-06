@@ -1,7 +1,16 @@
-import discord, json, aiohttp, asyncio
+import discord, json, aiohttp, asyncio, linecache, sys
 from discord.ext import commands
 from .printoverride import print as print
 
+def ReportException():
+    exc_type, exc_obj, tb = sys.exc_info()
+    f = tb.tb_frame
+    lineno = tb.tb_lineno
+    filename = f.f_code.co_filename
+    linecache.checkcache(filename)
+    line = linecache.getline(filename,lineno,f.f_globals)
+    print('Error on line: {}.\nCode: {}\nException: {}'.format(lineno,line.strip(),exc_obj))
+    return
 
 jsonfile = "OD"
 try:
@@ -23,34 +32,53 @@ class core:
 
     async def on_message(self,message):
         if (message.author.id != self.bot.user.id):
-            commandCheck = message.content.find(" ")
-            if (self.bot.commands.get(message.content[3:commandCheck]) is None):
+            try:
+                findDot = message.content.find(".")
+            except:
+                findDot = 0
+                pass
+            try:
+                findSpace = message.content.find(" ")
+            except:
+                findSpace = 0
+                pass
+            if (findDot - 2 != 0) and not ("od" in message.content[:findDot]) and (self.bot.commands.get(message.content[findDot:findSpace]) is None):
                 if "https://robertsspaceindustries.com/citizens/" in message.content and (message.channel.id == introChannelID):
                     urlCheck = message.content.find("https://robertsspaceindustries.com/citizens/")
                     correctURL = message.content[urlCheck:]
                     if " " in correctURL:
-                        urlSpaceCheck = correctURL.find(" ")
-                    else:
-                        urlSpaceCheck = len(correctURL)
-                    correctURL = correctURL[:urlSpaceCheck]
+                        correctURL = correctURL[:correctURL.find(" ")]
                     if "organizations" in correctURL:
                         correctURL = correctURL[:-14]
-                    slashFind = correctURL.rfind("/")+1
-                    foundHandle = correctURL[slashFind:]
-                    session = aiohttp.ClientSession()
-                    getURL = "http://sc-api.com/?data_source=RSI&api_source=live&system=accounts&action=full_profile&target_id={}".format(foundHandle)
+                    foundHandle = correctURL[correctURL.rfind("/")+1:]
+                    getURL = "http://sc-api.com/?data_source=RSI&api_source=live&system=accounts&action=full_profile&target_id={}".format(
+                        foundHandle)
                     headers = {'content-type': 'application/json'}
                     while True:
                         try:
+                            session = aiohttp.ClientSession()
                             async with session.post(getURL, headers=headers) as resp:
                                 allFound = (await resp.json())['data']
-                                found = allFound['organizations']
                                 await session.close()
                                 break
                         except:
-                            await session.close()
+                            try:
+                                await session.close()
+                            except:
+                                pass
                             await asyncio.sleep(2.5)
-                            continue
+                            pass
+                    try:
+                        found = allFound['organizations']
+                    except:
+                        await self.bot.add_reaction(message, "{}".format(pendingEmoji))
+                        embed = discord.Embed(colour=discord.Colour(0xFFFF00),
+                                              description="You have no visible orgs. Fix this and try again.".format(
+                                                  message.author))
+                        embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
+                        embed.set_thumbnail(url=allFound['avatar'])
+                        await self.bot.send_message(message.channel, embed=embed)
+                        return
                     orgFound = 0
                     for i in found:
                         if (i['sid'] != ""):
@@ -90,7 +118,6 @@ class core:
                         embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
                         embed.set_thumbnail(url=allFound['avatar'])
                         await self.bot.send_message(message.channel,embed=embed)
-        pass
 
     @commands.command(pass_context=True,hidden=True)
     async def emojis(self,ctx):

@@ -2,6 +2,7 @@ import discord, json, aiohttp, asyncio
 from discord.ext import commands
 from .printoverride import print as print
 
+
 jsonfile = "OD"
 try:
     with open('./{}.json'.format(jsonfile), 'r+', encoding="UTF-8") as secretfile:

@@ -20,6 +20,7 @@ try:
         approveRole = sec['OVERDRIVE']['approveRole']
         affiliateRole = sec['OVERDRIVE']['affiliateRole']
         serverID = sec['OVERDRIVE']['serverID']
+        checkDelay = sec['OVERDRIVE']['checkDelay']
 except FileNotFoundError:
     exit("{}.json is not in the current bot directory.".format(jsonfile))
 
@@ -102,7 +103,7 @@ class timed:
                 print("{0}\n{1}".format(error, e))
                 pass
             print(">> Automated check complete. Sleeping.")
-            await asyncio.sleep(43200)
+            await asyncio.sleep(int(checkDelay))
 
 def setup(bot):
     bot.add_cog(timed(bot))

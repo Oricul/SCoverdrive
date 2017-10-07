@@ -79,6 +79,14 @@ class core:
                         embed.set_thumbnail(url=allFound['avatar'])
                         await self.bot.send_message(message.channel, embed=embed)
                         return
+                    if found is None:
+                        embed = discord.Embed(colour=discord.Colour(0xFFFF00),
+                                              description="You have no visible orgs. Fix this and try again.".format(
+                                                  message.author))
+                        embed.set_author(name=allFound['handle'].title(), icon_url=allFound['avatar'])
+                        embed.set_thumbnail(url=allFound['avatar'])
+                        await self.bot.send_message(message.channel, embed=embed)
+                        return
                     orgFound = 0
                     for i in found:
                         if (i['sid'] != ""):

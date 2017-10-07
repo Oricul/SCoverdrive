@@ -57,5 +57,4 @@ async def on_ready():
             except Exception as e:
                 exc = '{}: {}'.format(type(e).__name__,e)
                 print('Failed to load extension: {}\n{}'.format(extension,exc))
-
 bot.run(token)

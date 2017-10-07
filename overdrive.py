@@ -57,5 +57,6 @@ async def on_ready():
             except Exception as e:
                 exc = '{}: {}'.format(type(e).__name__,e)
                 print('Failed to load extension: {}\n{}'.format(extension,exc))
+    await bot.change_presence(game=discord.Game(name='Star Citizen 3.0'))
 
 bot.run(token)

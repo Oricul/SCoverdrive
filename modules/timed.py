@@ -31,9 +31,8 @@ class timed:
 
     async def orgCheck(self):
         await self.bot.wait_until_ready()
-        await asyncio.sleep(10)
-        await self.bot.change_presence(game=discord.Game(name="Star Citizen 3.0"))
         while not self.bot.is_closed:
+            await self.bot.change_presence(game=discord.Game(name="Star Citizen 3.0"))
             print(">> Performing automated check of members.")
             try:
                 servObj = self.bot.get_server(serverID)

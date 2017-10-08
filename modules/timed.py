@@ -55,49 +55,70 @@ class timed:
                         print("RETRYING...")
                         pass
                 for dMember in servMem:
+                    dRoleList = []
+                    dRoleName = []
                     for dRole in dMember.roles:
-                        if (dRole.name.upper() == approveRole.upper()):
-                            if " " in dMember.display_name:
-                                print("MEMBER ({0}) has a SPACE in their HANDLE, which CAN'T happen.".format(dMember))
-                                await self.bot.remove_roles(dMember,dRole)
-                                continue
-                            foundMember = 0
+                        dRoleList.append(dRole)
+                        dRoleName.append(dRole.name.upper())
+                    if approveRole.upper() in dRoleName:
+                        if " " in dMember.display_name:
+                            print("MEMBER ({0} - {1}) has a SPACE in their HANDLE, which CAN'T happen.".format(dMember,dMember.display_name))
+                            await self.bot.remove_roles(dMember,dRole)
+                            continue
+                        foundMember = 0
+                        for orgMember in allFound:
+                            if orgMember['handle'] is not None:
+                                if (dMember.display_name.upper() == orgMember['handle'].upper()):
+                                    foundMember = 1
+                                    if (orgMember['type'].upper() != "MAIN"):
+                                        for servRole in servObj.roles:
+                                            if (servRole.name.upper() == affiliateRole.upper()):
+                                                print("MEMBER ({0} - {1}) detected as AFFILIATE.".format(dMember,dMember.display_name))
+                                                await self.bot.remove_roles(dMember,dRole)
+                                                await asyncio.sleep(2.5)
+                                                await self.bot.add_roles(dMember,servRole)
+                                                break
+                        if not foundMember:
+                            print("MEMBER ({0} - {1}) NOT DETECTED.".format(dMember,dMember.display_name))
+                            await self.bot.remove_roles(dMember,dRole)
+                    elif affiliateRole.upper() in dRoleName:
+                        if " " in dMember.display_name:
+                            print("AFFILIATE ({0} - {1}) has a SPACE in their HANDLE, which CAN'T happen.".format(dMember,dMember.display_name))
+                            await self.bot.remove_roles(dMember,dRole)
+                            continue
+                        foundMember = 0
+                        for orgMember in allFound:
+                            if orgMember['handle'] is not None:
+                                if (dMember.display_name.upper() == orgMember['handle'].upper()):
+                                    foundMember = 1
+                                    if (orgMember['type'].upper() != "AFFILIATE"):
+                                        for servRole in servObj.roles:
+                                            if (servRole.name.upper() == approveRole.upper()):
+                                                print("AFFILIATE ({0} - {1}) detected as MEMBER.".format(dMember,dMember.display_name))
+                                                await self.bot.remove_roles(dMember,dRole)
+                                                await asyncio.sleep(2.5)
+                                                await self.bot.add_roles(dMember,servRole)
+                                                break
+                        if not foundMember:
+                            print("AFFILIATE ({0} - {1}) NOT DETECTED.".format(dMember,dMember.display_name))
+                            await self.bot.remove_roles(dMember,dRole)
+                    else:
+                        if not " " in dMember.display_name:
                             for orgMember in allFound:
                                 if orgMember['handle'] is not None:
                                     if (dMember.display_name.upper() == orgMember['handle'].upper()):
-                                        foundMember = 1
-                                        if (orgMember['type'].upper() != "MAIN"):
-                                            for servRole in servObj.roles:
-                                                if (servRole.name.upper() == affiliateRole.upper()):
-                                                    print("MEMBER ({0}) detected as AFFILIATE.".format(dMember))
-                                                    await self.bot.remove_roles(dMember,dRole)
-                                                    await asyncio.sleep(2.5)
-                                                    await self.bot.add_roles(dMember,servRole)
-                                                    break
-                            if not foundMember:
-                                print("MEMBER ({0}) NOT DETECTED.".format(dMember))
-                                await self.bot.remove_roles(dMember,dRole)
-                        elif (dRole.name.upper() == affiliateRole.upper()):
-                            if " " in dMember.display_name:
-                                print("AFFILIATE ({0}) has a SPACE in their HANDLE, which CAN'T happen.".format(dMember))
-                                await self.bot.remove_roles(dMember,dRole)
-                                continue
-                            foundMember = 0
-                            for orgMember in allFound:
-                                if orgMember['handle'] is not None:
-                                    if (dMember.display_name.upper() == orgMember['handle'].upper()):
-                                        foundMember = 1
-                                        if (orgMember['type'].upper() != "AFFILIATE"):
+                                        if (orgMember['type'].upper() == "MAIN"):
                                             for servRole in servObj.roles:
                                                 if (servRole.name.upper() == approveRole.upper()):
-                                                    print("AFFILIATE ({0}) detected as MEMBER.".format(dMember))
-                                                    await self.bot.remove_roles(dMember,dRole)
-                                                    await asyncio.sleep(2.5)
+                                                    print("NON-MEMBER/AFFILIATE ({0} - {1}) detected as MEMBER.".format(dMember,dMember.display_name))
                                                     await self.bot.add_roles(dMember,servRole)
                                                     break
-                            if not foundMember:
-                                print("AFFILIATE ({0}) NOT DETECTED.".format(dMember))
-                                await self.bot.remove_roles(dMember,dRole)
+                                        elif (orgMember['type'].upper() == "AFFILIATE"):
+                                            for servRole in servObj.roles:
+                                                if (servRole.name.upper() == affiliateRole.upper()):
+                                                    print("NON-MEMBER/AFFILIATE ({0} - {1}) detected as AFFILIATE.".format(dMember,dMember.display_name))
+                                                    await self.bot.add_roles(dMember,servRole)
+                                                    break
                         await asyncio.sleep(2.5)
             except Exception as e:
                 error = ReportException()
